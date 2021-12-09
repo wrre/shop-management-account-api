@@ -1,4 +1,4 @@
-# npm
+ # npm
 node_modules
 
 # OS X
@@ -9,3 +9,6 @@ node_modules
 
 # env
 .env
+
+# volumes
+.data/

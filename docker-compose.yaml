@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  shop-management-account-postgres:
+    container_name: shop-management-account-postgres
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - .data:/var/lib/postgresql/data/
