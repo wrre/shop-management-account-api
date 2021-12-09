@@ -13,4 +13,4 @@ app.get('/health', (req, res) => {
 
 app.use('/auth', authRouter);
 
-app.listen(3001);
+app.listen(process.env.SERVICE_API_PORT);
