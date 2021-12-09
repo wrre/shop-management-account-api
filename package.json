@@ -2,13 +2,15 @@
   "name": "shop-management-account-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "npx nodemon --es-module-specifier-resolution=node index.js"
+    "start": "npx nodemon --es-module-specifier-resolution=node src/index.js"
   },
   "author": "Peggy Liu <fnoihtlanl@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.24.0",
+    "dotenv-safe": "^8.2.0",
     "express": "^4.17.1"
   },
   "type": "module",
