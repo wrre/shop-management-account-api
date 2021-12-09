@@ -1,0 +1,11 @@
+{
+  "name": "shop-management-account-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Peggy Liu <fnoihtlanl@gmail.com>",
+  "license": "ISC"
+}
