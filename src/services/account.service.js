@@ -1,13 +1,23 @@
 import querystring from 'querystring';
 import axios from 'axios';
+import * as fs from 'fs';
+import jwt from 'jsonwebtoken';
 import { AccountModel } from '../models';
 import { ROLE_MAP } from '../common/role.map';
 
-const { CLIENT_ID, REDIRECT_URI, RESPONSE_TYPE, SCOPE, CLIENT_SECRET } =
-  process.env;
+const {
+  CLIENT_ID,
+  REDIRECT_URI,
+  RESPONSE_TYPE,
+  SCOPE,
+  CLIENT_SECRET,
+  JWT_PRIVATE_KEY_PATH,
+} = process.env;
 
 const state = 'shop-management';
 const nonce = '09876xyz';
+
+const jwtPrivateKey = fs.readFileSync(JWT_PRIVATE_KEY_PATH);
 
 export class AccountService {
   static getLoginByLineUrl() {
@@ -92,6 +102,35 @@ export class AccountService {
       `loginByLine, id: ${account.id}, name: ${name}, lineThirdPartyId: ${lineThirdPartyId}`,
     );
 
-    return account;
+    const token = jwt.sign({ id: account.id }, jwtPrivateKey, {
+      algorithm: 'RS256',
+    });
+
+    return { token, account };
+  }
+
+  static async findAuthorizedAccountIds(id) {
+    const account = await AccountModel.findOne({
+      where: { id },
+      raw: true,
+    });
+
+    switch (true) {
+      case account.role === ROLE_MAP.SYSTEM:
+        return await AccountModel.findAll({
+          attributes: ['id'],
+          group: ['id'],
+          raw: true,
+        }).then((accounts) => accounts.map((account) => account.id));
+      case account.role === ROLE_MAP.ORGANIZATION && !!account.organizationId:
+        return await AccountModel.findAll({
+          where: { organizationId: account.organizationId },
+          attributes: ['id'],
+          group: ['id'],
+          raw: true,
+        }).then((accounts) => accounts.map((account) => account.id));
+      default:
+        return [id];
+    }
   }
 }
