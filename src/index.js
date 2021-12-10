@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/newline-after-import
 import './set-env';
+import './models';
 
 import express from 'express';
 import { authRouter } from './routers';
