@@ -1,0 +1,5 @@
+export const ROLE_MAP = {
+  NORMAL: 'NORMAL',
+  ORGANIZATION: 'ORGANIZATION',
+  SYSTEM: 'SYSTEM',
+};

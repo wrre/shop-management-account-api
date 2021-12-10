@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import * as querystring from 'querystring';
 import axios from 'axios';
+import { AccountModel } from '../models';
+import { AccountService } from '../services';
 
 export const authRouter = Router();
 
@@ -73,11 +75,16 @@ authRouter.post('/logins/line', async (req, res) => {
     return;
   }
 
-  const { sub: thirdPartyId, name } = verifyTokenResponse;
+  const { sub: lineThirdPartyId, name } = verifyTokenResponse;
+
+  const account = await AccountService.findOrCreateAccount({
+    name,
+    lineThirdPartyId,
+  });
 
   console.log(
-    `POST /logins/line, name: ${name}, thirdPartyId: ${thirdPartyId}`,
+    `POST /logins/line, id: ${account.id}, name: ${name}, lineThirdPartyId: ${lineThirdPartyId}`,
   );
 
-  res.sendStatus(200);
+  res.json(account);
 });
