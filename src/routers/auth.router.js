@@ -4,7 +4,8 @@ import { AuthService } from '../services';
 export const authRouter = Router();
 
 authRouter.get('/logins/line/url', (req, res) => {
-  const url = AuthService.getLoginByLineUrl();
+  const { redirectUri } = req.query;
+  const url = AuthService.getLoginByLineUrl(redirectUri);
   res.send({ url });
 });
 

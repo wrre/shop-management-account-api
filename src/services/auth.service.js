@@ -5,14 +5,8 @@ import jwt from 'jsonwebtoken';
 import { AccountModel } from '../models';
 import { ROLE_MAP } from '../common/role.map';
 
-const {
-  CLIENT_ID,
-  REDIRECT_URI,
-  RESPONSE_TYPE,
-  SCOPE,
-  CLIENT_SECRET,
-  JWT_PRIVATE_KEY_PATH,
-} = process.env;
+const { CLIENT_ID, RESPONSE_TYPE, SCOPE, CLIENT_SECRET, JWT_PRIVATE_KEY_PATH } =
+  process.env;
 
 const state = 'shop-management';
 const nonce = '09876xyz';
@@ -20,11 +14,11 @@ const nonce = '09876xyz';
 const jwtPrivateKey = fs.readFileSync(JWT_PRIVATE_KEY_PATH);
 
 export class AuthService {
-  static getLoginByLineUrl() {
+  static getLoginByLineUrl(redirectUri) {
     const query = querystring.stringify({
       response_type: RESPONSE_TYPE,
       client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
       state,
       scope: SCOPE,
       nonce,
@@ -51,7 +45,7 @@ export class AuthService {
   }
 
   static async loginByLine(data) {
-    const { code, state } = data;
+    const { redirectUri, code, state } = data;
 
     const verifyCodeResponse = await axios
       .post(
@@ -61,7 +55,7 @@ export class AuthService {
           code,
           client_id: CLIENT_ID,
           client_secret: CLIENT_SECRET,
-          redirect_uri: REDIRECT_URI,
+          redirect_uri: redirectUri,
         }),
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
       )
