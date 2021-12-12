@@ -20,7 +20,7 @@ const jwtPrivateKey = fs.readFileSync(JWT_PRIVATE_KEY_PATH);
 
 export class AuthService {
   static async findOrCreateAccount(data) {
-    const { name, ...login } = data;
+    const { name, avatar, ...login } = data;
     let account = await AccountModel.findOne({
       where: { ...login },
       raw: true,
@@ -29,12 +29,18 @@ export class AuthService {
     if (!account) {
       account = await AccountModel.create({
         name,
+        avatar,
         role: ROLE_MAP.NORMAL,
         ...login,
       });
     }
 
-    return account;
+    return {
+      id: account.id,
+      name: account.name,
+      role: account.role,
+      avatar: account.avatar,
+    };
   }
 
   static signToken(accountId) {
@@ -95,15 +101,20 @@ export class AuthService {
         throw e.data;
       });
 
-    const { sub: lineThirdPartyId, name } = verifyTokenResponse;
+    const {
+      sub: lineThirdPartyId,
+      name,
+      picture: avatar,
+    } = verifyTokenResponse;
 
     const account = await this.findOrCreateAccount({
       name,
+      avatar,
       lineThirdPartyId,
     });
 
     console.log(
-      `loginByLine, id: ${account.id}, name: ${name}, lineThirdPartyId: ${lineThirdPartyId}`,
+      `loginByLine, id: ${account.id}, name: ${name}, avatar: ${avatar}, lineThirdPartyId: ${lineThirdPartyId}`,
     );
 
     const token = this.signToken(account.id);
@@ -156,15 +167,16 @@ export class AuthService {
         throw e.data;
       });
 
-    const { id: facebookThirdPartyId, name } = getMeResponse;
+    const { id: facebookThirdPartyId, name, picture: avatar } = getMeResponse;
 
     const account = await this.findOrCreateAccount({
       name,
+      avatar,
       facebookThirdPartyId,
     });
 
     console.log(
-      `loginByFacebook, id: ${account.id}, name: ${name}, facebookThirdPartyId: ${facebookThirdPartyId}`,
+      `loginByFacebook, id: ${account.id}, name: ${name}, avatar: ${avatar}, facebookThirdPartyId: ${facebookThirdPartyId}`,
     );
 
     const token = this.signToken(account.id);

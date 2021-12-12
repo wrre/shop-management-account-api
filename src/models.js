@@ -38,6 +38,7 @@ AccountModel.init(
   {
     name: { type: DataTypes.STRING, allowNull: false },
     role: { type: DataTypes.STRING, allowNull: false },
+    avatar: { type: DataTypes.STRING, allowNull: true },
     organizationId: { type: DataTypes.INTEGER },
     lineThirdPartyId: { type: DataTypes.STRING },
     facebookThirdPartyId: { type: DataTypes.STRING },
