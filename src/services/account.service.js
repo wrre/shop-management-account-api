@@ -26,4 +26,23 @@ export class AccountService {
         return [id];
     }
   }
+
+  static async findAccountById(id) {
+    const account = await AccountModel.findOne({
+      where: { id },
+      raw: true,
+    });
+
+    if (!account) {
+      console.log(`findAccountById account not exist`);
+      throw Error();
+    }
+
+    return {
+      id: account.id,
+      name: account.name,
+      role: account.role,
+      avatar: account.avatar,
+    };
+  }
 }
