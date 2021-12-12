@@ -13,6 +13,7 @@ const {
   NODE_ENV,
   JWT_PUBLIC_KEY_PATH,
   SERVICE_API_PORT,
+  SERVICE_API_INTERNAL_PORT,
   SSL_PRIVATE_KEY_PATH,
   SSL_CERTIFICATE_PATH,
 } = process.env;
@@ -60,3 +61,5 @@ if (NODE_ENV === 'local') {
   const httpsServer = https.createServer(credentials, app);
   httpsServer.listen(SERVICE_API_PORT);
 }
+
+app.listen(SERVICE_API_INTERNAL_PORT);
