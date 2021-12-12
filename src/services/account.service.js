@@ -43,6 +43,7 @@ export class AccountService {
       name: account.name,
       role: account.role,
       avatar: account.avatar,
+      organizationId: account.organizationId,
     };
   }
 }
