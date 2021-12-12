@@ -5,27 +5,14 @@ import jwt from 'jsonwebtoken';
 import { AccountModel } from '../models';
 import { ROLE_MAP } from '../common/role.map';
 
-const { CLIENT_ID, RESPONSE_TYPE, SCOPE, CLIENT_SECRET, JWT_PRIVATE_KEY_PATH } =
+const { LINE_CLIENT_ID, LINE_CLIENT_SECRET, JWT_PRIVATE_KEY_PATH } =
   process.env;
 
-const state = 'shop-management';
-const nonce = '09876xyz';
+const lineState = 'shop-management';
 
 const jwtPrivateKey = fs.readFileSync(JWT_PRIVATE_KEY_PATH);
 
 export class AuthService {
-  static getLoginByLineUrl(redirectUri) {
-    const query = querystring.stringify({
-      response_type: RESPONSE_TYPE,
-      client_id: CLIENT_ID,
-      redirect_uri: redirectUri,
-      state,
-      scope: SCOPE,
-      nonce,
-    });
-    return `https://access.line.me/oauth2/v2.1/authorize?${query}`;
-  }
-
   static async findOrCreateAccount(data) {
     const { name, ...login } = data;
     let account = await AccountModel.findOne({
@@ -44,6 +31,23 @@ export class AuthService {
     return account;
   }
 
+  static signToken(accountId) {
+    return jwt.sign({ id: accountId }, jwtPrivateKey, {
+      algorithm: 'RS256',
+    });
+  }
+
+  static getLoginByLineUrl(redirectUri) {
+    const query = querystring.stringify({
+      response_type: 'code',
+      client_id: LINE_CLIENT_ID,
+      redirect_uri: redirectUri,
+      state: lineState,
+      scope: 'profile openid',
+    });
+    return `https://access.line.me/oauth2/v2.1/authorize?${query}`;
+  }
+
   static async loginByLine(data) {
     const { redirectUri, code, state } = data;
 
@@ -53,8 +57,8 @@ export class AuthService {
         querystring.stringify({
           grant_type: 'authorization_code',
           code,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
+          client_id: LINE_CLIENT_ID,
+          client_secret: LINE_CLIENT_SECRET,
           redirect_uri: redirectUri,
         }),
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
@@ -71,7 +75,7 @@ export class AuthService {
         'https://api.line.me/oauth2/v2.1/verify',
         querystring.stringify({
           id_token: verifyCodeResponse.id_token,
-          client_id: CLIENT_ID,
+          client_id: LINE_CLIENT_ID,
         }),
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
       )
@@ -96,9 +100,7 @@ export class AuthService {
       `loginByLine, id: ${account.id}, name: ${name}, lineThirdPartyId: ${lineThirdPartyId}`,
     );
 
-    const token = jwt.sign({ id: account.id }, jwtPrivateKey, {
-      algorithm: 'RS256',
-    });
+    const token = this.signToken(account.id);
 
     return { token, account };
   }
