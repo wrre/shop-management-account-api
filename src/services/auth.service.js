@@ -168,16 +168,15 @@ export class AuthService {
         throw e.data;
       });
 
-    const { id: facebookThirdPartyId, name, picture: avatar } = getMeResponse;
+    const { id: facebookThirdPartyId, name } = getMeResponse;
 
     const account = await this.findOrCreateAccount({
       name,
-      avatar,
       facebookThirdPartyId,
     });
 
     console.log(
-      `loginByFacebook, id: ${account.id}, name: ${name}, avatar: ${avatar}, facebookThirdPartyId: ${facebookThirdPartyId}`,
+      `loginByFacebook, id: ${account.id}, name: ${name}, facebookThirdPartyId: ${facebookThirdPartyId}`,
     );
 
     const token = this.signToken(account.id);
